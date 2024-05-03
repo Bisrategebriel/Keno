@@ -19,7 +19,7 @@ import ErrorPage from "../assets/images/error-image.jpg";
 
 const Keno = () => {
   const dispatch = useDispatch();
-  const kenoinfo = useSelector((state)=>state.Keno.kenoData);
+  const kenoinfo = useSelector((state) => state.Keno.kenoData);
   const preData = useSelector(prevData);
   const Result = useSelector(kenoResult);
   const errorVal = useSelector(error);
@@ -174,13 +174,13 @@ const Keno = () => {
   const screenWidth = window.screen.width;
   const screenHeight = window.screen.height;
 
-  useEffect(() => {
-    if (screenWidth !== 1280 && screenHeight !== 720) {
-      setDisplayWarning(true);
-    } else {
-      setDisplayWarning(false);
-    }
-  }, [screenWidth, screenHeight]);
+  // useEffect(() => {
+  //   if (screenWidth !== 1280 && screenHeight !== 720) {
+  //     setDisplayWarning(true);
+  //   } else {
+  //     setDisplayWarning(false);
+  //   }
+  // }, [screenWidth, screenHeight]);
 
   useEffect(() => {
     if (showVideo) {
@@ -246,25 +246,25 @@ const Keno = () => {
               <div className="col-span-3 pl-6 ">
                 {showResults ? (
                   <>
-                    <div className="bg-transparent absolute h-[8rem] w-[10rem]  overflow-hidden bottom-[1.8rem] right-[12rem]">
+                    <div className="bg-transparent absolute h-[60rem] w-[30rem]  overflow-hidden bottom-[1.8rem] right-[13.7rem]">
                       <div
-                        className={` absolute h-[8rem] w-[9rem] rounded-full overflow-hidden  right-4 ${
+                        className={` absolute h-[20rem] w-[20rem] rounded-full overflow-hidden  right-4 ${
                           numberOnBall > 39
                             ? "circle-gradient-brown"
                             : "circle-gradient-yellow"
                         } z-10 opacity-70 text-center ${!ballOne && "hidden"}`}
                       >
-                        <p className=" absolute top-[25%] right-[37%] rotate-45 font-bold text-[70px] Fontraj">
-                          {numberOnBall}
+                        <p className=" absolute top-[25%] right-[37%] rotate-45 font-bold text-[80px] Fontraj">
+                          {15}
                         </p>
-                        <p className=" absolute -top-[30%] left-[25%] rotate-180 font-bold text-[70px] Fontraj">
+                        <p className=" absolute -top-[30%] left-[25%] rotate-180 font-bold text-[80px] Fontraj">
                           {numberOnBall}
                         </p>
                       </div>
                     </div>
-                    <div className="bg-transparent absolute h-[20.2rem] w-[30rem]  overflow-hidden top-[11.2rem] right-[2.7rem]">
+                    <div className="bg-transparent absolute h-[30.1rem] w-[60rem]  overflow-hidden top-[18.2rem] right-[0.1rem]">
                       <div
-                        className={`vibrating absolute h-[24rem] w-[24rem] rounded-full overflow-hidden -top-7 right-11 ${
+                        className={`vibrating absolute h-[35.0rem] w-[35.0rem] rounded-full overflow-hidden -top-7 right-11 ${
                           numberOnBall > 39
                             ? "circle-gradient-brown"
                             : "circle-gradient-yellow"
@@ -273,11 +273,11 @@ const Keno = () => {
                    `}
                       >
                         <p
-                          className={` absolute top-[30%] right-[50%] rotate-25 font-bold text-[160px] Fontraj`}
+                          className={` absolute top-[30%] right-[50%] rotate-25 font-bold text-[180px] Fontraj`}
                         >
                           {numberOnBall}
                         </p>
-                        <p className=" absolute -top-[20%] left-[25%] rotate-180 font-bold text-[150px] Fontraj">
+                        <p className=" absolute -top-[20%] left-[25%] rotate-180 font-bold text-[180px] Fontraj">
                           {numberOnBall}
                         </p>
                         <p className=" absolute bottom-[20%] -right-[10%] -rotate-90 font-bold text-[150px] Fontraj">
