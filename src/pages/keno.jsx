@@ -174,13 +174,13 @@ const Keno = () => {
   const screenWidth = window.screen.width;
   const screenHeight = window.screen.height;
 
-  // useEffect(() => {
-  //   if (screenWidth !== 1280 && screenHeight !== 720) {
-  //     setDisplayWarning(true);
-  //   } else {
-  //     setDisplayWarning(false);
-  //   }
-  // }, [screenWidth, screenHeight]);
+  useEffect(() => {
+    if (screenWidth !== 1280 && screenHeight !== 720) {
+      setDisplayWarning(true);
+    } else {
+      setDisplayWarning(false);
+    }
+  }, [screenWidth, screenHeight]);
 
   useEffect(() => {
     if (showVideo) {
