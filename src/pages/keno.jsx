@@ -1,7 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect, useRef } from "react";
-
 import NumberGrids from "../components/numberGrids";
 import CountDown from "../components/CountDown";
 import { getKenoData, getKenoResult } from "../stores/keno/kenoAction";
@@ -15,7 +13,7 @@ import {
 import glass from "../assets/images/glass.png";
 import historyBg from "../assets/images/historyBg.png";
 import keno from "../assets/images/keno.png";
-import ErrorPage from "../assets/images/error-image.jpg";
+import shuffleVideo from "../assets/shuffle.mp4";
 
 const Keno = () => {
   const dispatch = useDispatch();
@@ -46,6 +44,10 @@ const Keno = () => {
     calculateDifference();
   }, [errorVal, dispatch]);
 
+  useEffect(() => {
+    calculateDifference();
+  }, [kenoinfo.startTime]);
+
   const calculateDifference = () => {
     if (kenoinfo.startTime && kenoinfo.serverTime) {
       const serverTime = new Date(kenoinfo.serverTime);
@@ -58,12 +60,11 @@ const Keno = () => {
       const differenceInSeconds = Math.floor(
         (new Date().getTime() - new Date(kenoinfo.startTime).getTime()) / 1000
       );
-      // setSeconds(3);
       setSeconds(303 - differenceInSeconds + timeDifferenceWithServer);
     }
   };
 
-  const handleVideoEnd = async () => {
+  const handleVideoEnd = () => {
     dispatch(getKenoResult(kenoinfo._id));
     setShowVideo(false);
     setShowResults(true);
@@ -74,12 +75,12 @@ const Keno = () => {
     const timer = setTimeout(() => {
       setShowResults(false);
       setShowPrev(false);
+      setNumberOnBall(""); // Reset numberOnBall
+      setWinnerCount(0); // Reset winnerCount
       calculateDifference();
     }, 8000);
 
-    return () => {
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   };
 
   const handleBallMovement = (num) => {
@@ -109,37 +110,24 @@ const Keno = () => {
       };
 
       updateBalls(); // Start the initial update
-
-      // Cleanup the interval when the component unmounts
-      return () => clearInterval(updateBalls);
     }
   }, [numberOnBall]);
 
   useEffect(() => {
-    //for calculateing what number the count down should start from
-    calculateDifference();
-  }, [kenoinfo.startTime]);
-
-  useEffect(() => {
-    // for displaying win hisory
     const timer = setTimeout(() => {
       setShowResults(false);
       setShowPrev(false);
     }, 8000);
     calculateDifference();
 
-    return () => {
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, [showPrev]);
 
   useEffect(() => {
-    //the count down effect
     const intervalId = setInterval(() => {
       if (seconds > 0) {
         setSeconds((prevSeconds) => prevSeconds - 1);
-        if (seconds == 1) {
-          // add delay to show bet closed before showing video
+        if (seconds === 1) {
           setTimeout(() => {
             setShowVideo(true);
           }, 3000);
@@ -153,10 +141,7 @@ const Keno = () => {
   }, [seconds]);
 
   useEffect(() => {
-    if (
-      localStorage.getItem("token") === null ||
-      localStorage.getItem("token") === undefined
-    ) {
+    if (!localStorage.getItem("token")) {
       window.location.href = "/login";
     }
   }, []);
@@ -171,17 +156,6 @@ const Keno = () => {
     }
   };
 
-  const screenWidth = window.screen.width;
-  const screenHeight = window.screen.height;
-
-  useEffect(() => {
-    if (screenWidth !== 1280 && screenHeight !== 720) {
-      setDisplayWarning(true);
-    } else {
-      setDisplayWarning(false);
-    }
-  }, [screenWidth, screenHeight]);
-
   useEffect(() => {
     if (showVideo) {
       const timer = setTimeout(() => {
@@ -194,16 +168,29 @@ const Keno = () => {
     }
   }, [showVideo]);
 
+  useEffect(() => {
+    if (showResults && Result && Result.length > 0) {
+      // Assume Result is an array of numbers
+      handleBallMovement(Result[0]); // For example, show the first result
+      setWinnerCount(Result.length); // Update winner count
+    }
+  }, [showResults, Result]);
+
+  const screenWidth = window.screen.width;
+  const screenHeight = window.screen.height;
+
+  useEffect(() => {
+    if (screenWidth !== 1280 && screenHeight !== 720) {
+      setDisplayWarning(true);
+    } else {
+      setDisplayWarning(false);
+    }
+  }, [screenWidth, screenHeight]);
   return (
     <>
       {displayWarning ? (
         <div className="flex items-center justify-center h-screen bg-gray-600">
-          <h1
-            className="text-2xl text-white l"
-            style={{
-              fontSize: "3rem",
-            }}
-          >
+          <h1 className="text-2xl text-white" style={{ fontSize: "3rem" }}>
             Please set the screen display to 1280 x 720
           </h1>
         </div>
@@ -218,16 +205,14 @@ const Keno = () => {
             <video
               className="absolute top-0 left-0 z-20 object-cover w-screen h-screen"
               autoPlay
-              muted={true}
+              muted
               preload="auto"
-              onLoadedData={() => {
-                videoRef.current && videoRef.current.play();
-              }}
-              onError={handleVideoError} // Handle video error
+              onLoadedData={() => videoRef.current && videoRef.current.play()}
+              onError={handleVideoError}
               onEnded={handleVideoEnd}
               ref={videoRef}
             >
-              <source src={"/shuffle.mp4"} type="video/mp4" />
+              <source src={shuffleVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           ) : !showPrev ? (
@@ -238,33 +223,33 @@ const Keno = () => {
                   game_Id={kenoinfo._id}
                   seconds={seconds}
                   showResults={showResults}
-                  toggleShowResult={() => handleGameRestart()}
-                  setResultNumber={(num) => handleBallMovement(num)}
-                  setWinnerCount={(num) => setWinnerCount(num)}
+                  toggleShowResult={handleGameRestart}
+                  setResultNumber={handleBallMovement}
+                  setWinnerCount={setWinnerCount}
                 />
               </div>
               <div className="col-span-3 pl-6 ">
                 {showResults ? (
                   <>
-                    <div className="bg-transparent absolute h-[60rem] w-[30rem]  overflow-hidden bottom-[1.8rem] right-[13.7rem]">
+                    <div className="bg-transparent absolute h-[8rem] w-[10rem]  overflow-hidden bottom-[1.8rem] right-[14.7rem]">
                       <div
-                        className={` absolute h-[20rem] w-[20rem] rounded-full overflow-hidden  right-4 ${
+                        className={` absolute h-[8rem] w-[9rem] rounded-full overflow-hidden  right-4 ${
                           numberOnBall > 39
                             ? "circle-gradient-brown"
                             : "circle-gradient-yellow"
                         } z-10 opacity-70 text-center ${!ballOne && "hidden"}`}
                       >
-                        <p className=" absolute top-[25%] right-[37%] rotate-45 font-bold text-[80px] Fontraj">
-                          {15}
+                        <p className=" absolute top-[25%] right-[37%] rotate-45 font-bold text-[70px] Fontraj">
+                          {numberOnBall}
                         </p>
-                        <p className=" absolute -top-[30%] left-[25%] rotate-180 font-bold text-[80px] Fontraj">
+                        <p className=" absolute -top-[30%] left-[25%] rotate-180 font-bold text-[70px] Fontraj">
                           {numberOnBall}
                         </p>
                       </div>
                     </div>
-                    <div className="bg-transparent absolute h-[30.1rem] w-[60rem]  overflow-hidden top-[18.2rem] right-[0.1rem]">
+                    <div className="bg-transparent absolute h-[25.2rem] w-[30rem]  overflow-hidden top-[14.2rem] right-4 ">
                       <div
-                        className={`vibrating absolute h-[35.0rem] w-[35.0rem] rounded-full overflow-hidden -top-7 right-11 ${
+                        className={`vibrating absolute h-[30rem] w-[30rem] rounded-full overflow-hidden -top-7  ${
                           numberOnBall > 39
                             ? "circle-gradient-brown"
                             : "circle-gradient-yellow"
@@ -273,11 +258,11 @@ const Keno = () => {
                    `}
                       >
                         <p
-                          className={` absolute top-[30%] right-[50%] rotate-25 font-bold text-[180px] Fontraj`}
+                          className={` absolute top-[30%] right-[50%] rotate-25 font-bold text-[160px] Fontraj`}
                         >
                           {numberOnBall}
                         </p>
-                        <p className=" absolute -top-[20%] left-[25%] rotate-180 font-bold text-[180px] Fontraj">
+                        <p className=" absolute -top-[20%] left-[25%] rotate-180 font-bold text-[150px] Fontraj">
                           {numberOnBall}
                         </p>
                         <p className=" absolute bottom-[20%] -right-[10%] -rotate-90 font-bold text-[150px] Fontraj">
@@ -307,12 +292,12 @@ const Keno = () => {
                         </p>
                       </div>
                     </div>
+
                     <div className="absolute flex text-3xl font-semibold text-gray-300 top-20 right-8">
                       <p>{winnerCount}</p>
                       <p className="mt-1">/</p>
                       <p className="mt-1">20</p>
                     </div>
-
                     <img src={glass} alt="glass" className="h-[100%]" />
                   </>
                 ) : (
@@ -338,32 +323,26 @@ const Keno = () => {
                     <div className="flex gap-2">
                       {[...dataArray]
                         .sort((a, b) => a - b)
-                        .map(
-                          (
-                            number,
-                            i,
-                            array //sorted the array before display as ball
-                          ) => (
-                            <React.Fragment key={i}>
-                              {number > 39 && array[i - 1] <= 39 && (
-                                <div
-                                  key={number}
-                                  className="h-12  left-1/2 bg-gray-500 w-[2px] "
-                                ></div> //vertical separator
-                              )}
+                        .map((number, i, array) => (
+                          <React.Fragment key={i}>
+                            {number > 39 && array[i - 1] <= 39 && (
                               <div
-                                key={i}
-                                className={`w-12 h-12 rounded-full  flex items-center justify-center text-black Fontraj shadow-lg ${
-                                  number > 39 ? "bg-[#ff9b17]" : "bg-[#ffff00]"
-                                }`}
-                              >
-                                <p className="text-2xl font-bold text-center ">
-                                  {number}
-                                </p>
-                              </div>
-                            </React.Fragment>
-                          )
-                        )}
+                                key={number}
+                                className="h-12 left-1/2 bg-gray-500 w-[2px]"
+                              ></div>
+                            )}
+                            <div
+                              key={i}
+                              className={`w-12 h-12 rounded-full flex items-center justify-center text-black Fontraj shadow-lg ${
+                                number > 39 ? "bg-[#ff9b17]" : "bg-[#ffff00]"
+                              }`}
+                            >
+                              <p className="text-2xl font-bold text-center ">
+                                {number}
+                              </p>
+                            </div>
+                          </React.Fragment>
+                        ))}
                     </div>
                   </div>
                 ))}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getKenoData, getKenoResult } from "../stores/keno/kenoAction";
-import { kenoResult,prevData } from "../stores/keno/kenoSlice";
+import { kenoResult, prevData } from "../stores/keno/kenoSlice";
 import draw from "../assets/images/draw-text.png";
 
 const NumberGrids = ({
@@ -12,7 +12,6 @@ const NumberGrids = ({
   setResultNumber,
   setWinnerCount,
 }) => {
-
   const [selected, setSelected] = useState([]);
   const [numForDisplay, setNumForDisplay] = useState([]);
   const [hasStartedDisplay, setHasStartedDisplay] = useState(false);
@@ -65,8 +64,7 @@ const NumberGrids = ({
 
   useEffect(() => {
     const fetchDataAndStartDisplay = async () => {
-      seconds > 0 &&
-        setNumForDisplay(preData[0]);
+      seconds > 0 && setNumForDisplay(preData[0]);
       if (seconds === 0 && hasStartedDisplay === false) {
         if (Result.length > 0 && showResults) {
           startNumberDisplay();
@@ -85,12 +83,11 @@ const NumberGrids = ({
   return (
     <div className="relative flex flex-col   h-vh w-full">
       <div className="flex  align-middle  h-full w-full absolute top-6 left-8 ">
-        <img
-          src={draw}
-          alt="keno"
-          className=" max-h-[3rem] mt-3 mr-4 "
-          />
-        <span className="font-[900] text-7xl  text-shadow Fontraj text-white"> {seconds > 0 ? gameId - 1 : gameId}</span>{" "}
+        <img src={draw} alt="keno" className=" max-h-[3rem] mt-3 mr-4 " />
+        <span className="font-[900] text-7xl  text-shadow Fontraj text-white">
+          {" "}
+          {seconds > 0 ? gameId - 1 : gameId}
+        </span>{" "}
       </div>
       <div className="flex items-center justify-end w-full mb-1 mt-12">
         <div
@@ -102,7 +99,8 @@ const NumberGrids = ({
         >
           <h2
             className={`text-3xl font-[600] py-4 Fontraj ${
-              range !== "HEADS" && "hidden" }`}
+              range !== "HEADS" && "hidden"
+            }`}
           >
             HEADS
           </h2>
@@ -120,7 +118,6 @@ const NumberGrids = ({
                   : " bg-[#ff9b17]   scale-105 transition-transform draw-effect"
                 : "bg-gradient-to-b from-[#ee120eeb] to-[#a40201]  text-[#e90201]"
             }`}
-           
           >
             <h3 className="text-[44px] font-[400] Fontraj">{number}</h3>
           </div>
