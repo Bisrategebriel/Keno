@@ -27,4 +27,5 @@ root.render(
   // </React.StrictMode>
 );
 
+// Register the service worker for caching
 reportWebVitals();
