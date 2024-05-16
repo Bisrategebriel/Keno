@@ -64,6 +64,7 @@ const Keno = () => {
     }
   };
 
+  console.log(kenoinfo);
   const handleVideoEnd = () => {
     dispatch(getKenoResult(kenoinfo._id));
     setShowVideo(false);
@@ -91,25 +92,20 @@ const Keno = () => {
 
   useEffect(() => {
     if (numberOnBall !== "") {
-      const updateBalls = () => {
-        // Use an array to represent the time delays for each ball
-        const delays = [30, 1300, 60];
+      const delays = [30, 1300, 60];
 
-        setBallOne(true);
+      setBallOne(true);
+      setTimeout(() => {
+        setBallOne(false);
+        setBallTwo(true);
         setTimeout(() => {
-          setBallOne(false);
-          setBallTwo(true);
+          setBallTwo(false);
+          setBallThree(true);
           setTimeout(() => {
-            setBallTwo(false);
-            setBallThree(true);
-            setTimeout(() => {
-              setBallThree(false);
-            }, delays[2]);
-          }, delays[1]);
-        }, delays[0]);
-      };
-
-      updateBalls(); // Start the initial update
+            setBallThree(false);
+          }, delays[2]);
+        }, delays[1]);
+      }, delays[0]);
     }
   }, [numberOnBall]);
 
@@ -129,6 +125,7 @@ const Keno = () => {
         setSeconds((prevSeconds) => prevSeconds - 1);
         if (seconds === 1) {
           setTimeout(() => {
+            dispatch(getKenoResult(kenoinfo._id));
             setShowVideo(true);
           }, 3000);
         }
@@ -168,24 +165,17 @@ const Keno = () => {
     }
   }, [showVideo]);
 
-  useEffect(() => {
-    if (showResults && Result && Result.length > 0) {
-      // Assume Result is an array of numbers
-      handleBallMovement(Result[0]); // For example, show the first result
-      setWinnerCount(Result.length); // Update winner count
-    }
-  }, [showResults, Result]);
-
   const screenWidth = window.screen.width;
   const screenHeight = window.screen.height;
 
   useEffect(() => {
-    if (screenWidth !== 1280 && screenHeight !== 720) {
+    if (screenWidth !== 1280 || screenHeight !== 720) {
       setDisplayWarning(true);
     } else {
       setDisplayWarning(false);
     }
   }, [screenWidth, screenHeight]);
+
   return (
     <>
       {displayWarning ? (
@@ -247,9 +237,9 @@ const Keno = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="bg-transparent absolute h-[25.2rem] w-[30rem]  overflow-hidden top-[14.2rem] right-4 ">
+                    <div className="bg-transparent absolute h-[20.2rem] w-[28rem]  overflow-hidden top-[11.2rem] right-12 ">
                       <div
-                        className={`vibrating absolute h-[30rem] w-[30rem] rounded-full overflow-hidden -top-7  ${
+                        className={`vibrating absolute h-[23rem] w-[28rem] rounded-full overflow-hidden -top-7  ${
                           numberOnBall > 39
                             ? "circle-gradient-brown"
                             : "circle-gradient-yellow"
